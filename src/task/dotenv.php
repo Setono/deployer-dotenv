@@ -30,6 +30,9 @@ task('dotenv:prepare', static function (): void {
     }
 })->desc('Copies .env.[stage].local from previous release folder or creates a new one');
 
+/**
+ * This task should be called BEFORE deploy:symlink
+ */
 task('dotenv:generate-php', static function (): void {
     run('cd {{release_path}} && {{bin/composer}} symfony:dump-env {{stage}}');
 })->desc('Generates the .env.local.php file');
