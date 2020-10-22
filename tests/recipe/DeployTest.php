@@ -18,6 +18,8 @@ final class DeployTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
+        \Safe\set_include_path(get_include_path() . \PATH_SEPARATOR . __DIR__ . '/../../vendor/deployer/deployer');
+
         // init repository
         $repository = __DIR__ . '/repository';
 
@@ -30,7 +32,7 @@ final class DeployTest extends TestCase
 
     protected function setUp(): void
     {
-        // init deployer and application tester
+        // init deployer and application tester0
         $console = new Application();
         $console->setAutoExit(false);
         $this->tester = new ApplicationTester($console);

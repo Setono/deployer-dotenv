@@ -10,7 +10,7 @@ use function Deployer\localhost;
 use function Deployer\set;
 use function Deployer\task;
 
-require_once 'vendor/deployer/deployer/recipe/common.php';
+require_once 'recipe/common.php';
 require_once 'recipe/dotenv.php';
 
 // configuration
