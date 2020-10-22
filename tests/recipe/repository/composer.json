@@ -1,0 +1,9 @@
+{
+    "name": "setono/deployer-dotenv-test-repository",
+    "description": "composer.json needed for generating .env.local.php",
+    "license": "MIT",
+    "require": {
+        "symfony/dotenv": "^4.4 || ^5.0",
+        "symfony/flex": "^1.9"
+    }
+}

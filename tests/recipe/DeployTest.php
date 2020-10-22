@@ -7,7 +7,6 @@ namespace Setono\Deployer\DotEnv\recipe;
 use Deployer\Console\Application;
 use Deployer\Deployer;
 use PHPUnit\Framework\TestCase;
-use function Safe\sprintf;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
@@ -69,13 +68,20 @@ final class DeployTest extends TestCase
         ]);
 
         $display = $this->tester->getDisplay();
-        echo "\n\n\n$display\n\n\n";
         self::assertEquals(0, $this->tester->getStatusCode(), $display);
 
         foreach ($this->deployer->hosts as $host) {
             $deployPath = $host->get('deploy_path');
 
-            self::assertFileExists($deployPath . '/current/README.md');
+            self::assertFileExists($deployPath . '/current/.env.prod.local');
+            self::assertFileExists($deployPath . '/current/.env.local.php');
+
+            $env = require $deployPath . '/current/.env.local.php';
+            self::assertArrayHasKey('APP_ENV', $env);
+            self::assertArrayHasKey('ENV_VAR', $env);
+
+            self::assertSame('prod', $env['APP_ENV']);
+            self::assertSame('value', $env['ENV_VAR']);
         }
     }
 }
