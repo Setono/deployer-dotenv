@@ -10,4 +10,5 @@ use function Deployer\before;
 require_once 'task/dotenv.php';
 
 after('deploy:update_code', 'dotenv:prepare');
-before('deploy:symlink', 'dotenv:generate-php');
+before('deploy:symlink', 'dotenv:update');
+before('dotenv:update', 'dotenv:generate');

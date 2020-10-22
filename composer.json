@@ -13,6 +13,7 @@
         "php": "^7.4",
         "deployer/deployer": "^6.8",
         "symfony/console": "^4.4 || ^5.0",
+        "symfony/dotenv": "^4.4 || ^5.0",
         "thecodingmachine/safe": "^1.2",
         "webmozart/assert": "^1.1"
     },
