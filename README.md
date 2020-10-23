@@ -1,5 +1,10 @@
 # DotEnv handling with Deployer
 
+[![Latest Version][ico-version]][link-packagist]
+[![Latest Unstable Version][ico-unstable-version]][link-packagist]
+[![Software License][ico-license]](LICENSE)
+[![Build Status][ico-github-actions]][link-github-actions]
+
 If you use [Deployer](https://deployer.org/) as your deployment tool
 and [Symfony](https://symfony.com/) in your application this library is for you.
 
@@ -18,3 +23,11 @@ Instead, we have a `.env.[stage].local` and `.env.local.php` in each release fol
 environment variables.
 
 * Finally we run `composer symfony:dump-env [stage]` to generate the `.env.local.php` file for the current release.
+
+[ico-version]: https://poser.pugx.org/setono/deployer-dotenv/v/stable
+[ico-unstable-version]: https://poser.pugx.org/setono/deployer-dotenv/v/unstable
+[ico-license]: https://poser.pugx.org/setono/deployer-dotenv/license
+[ico-github-actions]: https://github.com/Setono/deployer-dotenv/workflows/build/badge.svg
+
+[link-packagist]: https://packagist.org/packages/setono/deployer-dotenv
+[link-github-actions]: https://github.com/Setono/deployer-dotenv/actions
