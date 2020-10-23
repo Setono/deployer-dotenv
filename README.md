@@ -11,7 +11,8 @@ Now we have a very specific, but simple, strategy for updating the `.env` files 
 * We do **not** share the `.env.local.php`, `.env.local` files as is the default by Deployer.
 Instead, we have a `.env.[stage].local` and `.env.local.php` in each release folder.
 
-* When deploying we copy the `.env.[stage].local` file from the previous release (if there was a previous relesae).
+* When deploying we copy the `.env.[stage].local` file from the previous release
+(if there was a previous release, else we create it).
 
 * If you are deploying interactively (i.e. manually) you are presented with a dialog asking if you want to update any
 environment variables.
