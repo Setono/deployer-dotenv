@@ -14,6 +14,7 @@
         "deployer/deployer": "^6.8",
         "symfony/console": "^4.4 || ^5.0",
         "symfony/dotenv": "^4.4 || ^5.0",
+        "symfony/flex": "^1.9",
         "thecodingmachine/safe": "^1.2"
     },
     "require-dev": {
