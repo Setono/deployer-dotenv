@@ -24,6 +24,28 @@ environment variables.
 
 * Finally we run `composer symfony:dump-env [stage]` to generate the `.env.local.php` file for the current release.
 
+## Installation
+
+```bash
+$ composer require setono/deployer-dotenv
+```
+
+## Usage
+
+In your `deploy.php` file require the recipe:
+
+```php
+<?php
+
+namespace Deployer;
+
+require_once 'recipe/dotenv.php';
+
+// ...
+```
+
+This will automatically hook into the default flow of Deployer.
+
 [ico-version]: https://poser.pugx.org/setono/deployer-dotenv/v/stable
 [ico-unstable-version]: https://poser.pugx.org/setono/deployer-dotenv/v/unstable
 [ico-license]: https://poser.pugx.org/setono/deployer-dotenv/license
