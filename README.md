@@ -6,7 +6,7 @@
 [![Build Status][ico-github-actions]][link-github-actions]
 
 If you use [Deployer](https://deployer.org/) as your deployment tool
-and [Symfony](https://symfony.com/) in your application this library is for you.
+and `.env` files to handle environment variables (i.e. Symfony) this library is for you.
 
 Are you still accessing your server to update environment variables manually after a deployment?
 We also did that and that's the main reason why we built this library.
