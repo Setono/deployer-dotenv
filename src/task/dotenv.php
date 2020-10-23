@@ -57,6 +57,22 @@ task('dotenv:update', static function (): void {
 
     $output = output();
 
+    $outputVariablesFunction = static function (OutputInterface $output, array $variables): void {
+        ksort($variables);
+
+        $table = new Table($output);
+        $table->setRows([
+            ['Variable', 'Value'],
+            new TableSeparator(),
+        ]);
+
+        foreach ($variables as $key => $val) {
+            $table->addRow([$key, $val]);
+        }
+
+        $table->render();
+    };
+
     /**
      * We want two arrays to begin with. This allows us to easily compare the two arrays later on
      * when the $variables may have been changed by the user
@@ -66,7 +82,7 @@ task('dotenv:update', static function (): void {
     $variables = $initialVariables = eval('?>' . run('cat {{release_path}}/.env.local.php'));
 
     while (true) {
-        outputVariables($output, $variables);
+        $outputVariablesFunction($output, $variables);
 
         $confirmation = askConfirmation('Do you want to update ' . (isset($confirmation) ? 'more' : 'any') . ' environment variables?');
         if (false === $confirmation) {
@@ -121,23 +137,3 @@ task('dotenv:update', static function (): void {
         invoke('dotenv:generate');
     }
 })->desc('Allows the user to update environment variables');
-
-/**
- * @param array<string, string> $variables
- */
-function outputVariables(OutputInterface $output, array $variables): void
-{
-    ksort($variables);
-
-    $table = new Table($output);
-    $table->setRows([
-        ['Variable', 'Value'],
-        new TableSeparator(),
-    ]);
-
-    foreach ($variables as $key => $val) {
-        $table->addRow([$key, $val]);
-    }
-
-    $table->render();
-}
