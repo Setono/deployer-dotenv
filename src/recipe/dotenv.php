@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Setono\Deployer\DotEnv;
 
-use Deployer\Deployer;
 use function Deployer\after;
 use function Deployer\before;
+use Deployer\Deployer;
 
 require_once 'task/dotenv.php';
 
@@ -19,7 +19,7 @@ $deployer = Deployer::get();
  * and cache warmup tasks sometimes depend in environment variables. Therefore it's a good idea
  * to have those defined before running these tasks.
  */
-if($deployer->tasks->has('deploy:cache:clear')) {
+if ($deployer->tasks->has('deploy:cache:clear')) {
     before('deploy:cache:clear', 'dotenv:update');
 } else {
     before('deploy:symlink', 'dotenv:update');
