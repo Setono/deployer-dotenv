@@ -14,11 +14,11 @@ use function Deployer\run;
 use function Deployer\set;
 use function Deployer\task;
 use function Deployer\test;
-use function Safe\ksort;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Dotenv\Dotenv;
+use Webmozart\Assert\Assert;
 
 /**
  * This step has to come AFTER the deploy:update_code step because
@@ -66,6 +66,10 @@ task('dotenv:update', static function (): void {
             new TableSeparator(),
         ]);
 
+        /**
+         * @var string $key
+         * @var string $val
+         */
         foreach ($variables as $key => $val) {
             $table->addRow([$key, $val]);
         }
@@ -76,10 +80,8 @@ task('dotenv:update', static function (): void {
     /**
      * We want two arrays to begin with. This allows us to easily compare the two arrays later on
      * when the $variables may have been changed by the user
-     *
-     * @var array<string, string> $variables
      */
-    $variables = $initialVariables = eval('?>' . run('cat {{release_path}}/.env.local.php'));
+    $variables = $initialVariables = evalEnv(run('cat {{release_path}}/.env.local.php'));
 
     while (true) {
         $outputVariablesFunction($output, $variables);
@@ -107,7 +109,11 @@ task('dotenv:update', static function (): void {
      * See https://www.php.net/manual/en/language.operators.array.php
      */
     if ($initialVariables != $variables) {
-        // This array contains the environment variables already overridden
+        /**
+         * This array contains the environment variables already overridden
+         *
+         * @var array<string, string> $overriddenValues
+         */
         $overriddenValues = (new Dotenv())->parse(run('cat {{release_path}}/.env.{{stage}}.local'));
 
         /**
@@ -137,3 +143,16 @@ task('dotenv:update', static function (): void {
         invoke('dotenv:generate');
     }
 })->desc('Allows the user to update environment variables');
+
+/**
+ * @return array<string, scalar>
+ */
+function evalEnv(string $envContents): array
+{
+    /** @var array<string, scalar> $res */
+    $res = eval('?>' . $envContents);
+    Assert::isArray($res);
+    Assert::allScalar($res);
+
+    return $res;
+}

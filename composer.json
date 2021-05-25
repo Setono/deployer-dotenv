@@ -10,15 +10,15 @@
         }
     ],
     "require": {
-        "php": "^7.4",
+        "php": ">=7.4",
         "deployer/deployer": "^6.8",
         "symfony/console": "^4.4 || ^5.0",
         "symfony/dotenv": "^4.4 || ^5.0",
-        "thecodingmachine/safe": "^1.2"
+        "webmozart/assert": "^1.10"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.4",
-        "setono/code-quality-pack": "^1.4"
+        "phpunit/phpunit": "^9.5",
+        "setono/code-quality-pack": "^2.1"
     },
     "config": {
         "sort-packages": true
@@ -43,9 +43,9 @@
     },
     "prefer-stable": true,
     "scripts": {
-        "analyse": "phpstan analyse -c phpstan.neon",
-        "check-style": "ecs check --ansi src/ tests/",
-        "fix-style": "ecs check --fix --ansi src/ tests/",
+        "analyse": "psalm",
+        "check-style": "ecs check",
+        "fix-style": "ecs check --fix",
         "phpunit": "phpunit"
     }
 }
