@@ -77,11 +77,20 @@ task('dotenv:update', static function (): void {
         $table->render();
     };
 
+    $evalEnv = static function (string $envContents): array {
+        /** @var array<string, scalar> $res */
+        $res = eval('?>' . $envContents);
+        Assert::isArray($res);
+        Assert::allScalar($res);
+
+        return $res;
+    };
+
     /**
      * We want two arrays to begin with. This allows us to easily compare the two arrays later on
      * when the $variables may have been changed by the user
      */
-    $variables = $initialVariables = evalEnv(run('cat {{release_path}}/.env.local.php'));
+    $variables = $initialVariables = $evalEnv(run('cat {{release_path}}/.env.local.php'));
 
     while (true) {
         $outputVariablesFunction($output, $variables);
@@ -143,16 +152,3 @@ task('dotenv:update', static function (): void {
         invoke('dotenv:generate');
     }
 })->desc('Allows the user to update environment variables');
-
-/**
- * @return array<string, scalar>
- */
-function evalEnv(string $envContents): array
-{
-    /** @var array<string, scalar> $res */
-    $res = eval('?>' . $envContents);
-    Assert::isArray($res);
-    Assert::allScalar($res);
-
-    return $res;
-}
