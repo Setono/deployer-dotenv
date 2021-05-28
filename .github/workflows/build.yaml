@@ -119,7 +119,7 @@ jobs:
                 run: "mkdir -p .build/phpstan"
 
             -   name: "Cache cache directory for phpstan/phpstan"
-                uses: "actions/cache@v2.1.2"
+                uses: "actions/cache@v2.1.6"
                 with:
                     path: ".build/phpstan"
                     key: "php-${{ matrix.php-version }}-phpstan-${{ github.sha }}"
