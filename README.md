@@ -27,7 +27,7 @@ environment variables.
 ## Installation
 
 ```bash
-$ composer require setono/deployer-dotenv
+composer require setono/deployer-dotenv
 ```
 
 ## Usage
