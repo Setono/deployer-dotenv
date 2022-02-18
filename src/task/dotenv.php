@@ -33,6 +33,12 @@ task('dotenv:prepare', static function (): void {
         set('stage', 'prod');
     }
 
+    // this small trick will make sure the environment (i.e. for the console) is set to the expected environment
+    // when running commands before the generation of the .env.local.php is run
+    if (!test('[ -f {{release_path}}/.env.local ]')) {
+        run('echo "APP_ENV={{stage}}" > {{release_path}}/.env.local');
+    }
+
     if (has('previous_release') && test('[ -f {{previous_release}}/.env.{{stage}}.local ]')) {
         run('cp {{previous_release}}/.env.{{stage}}.local {{release_path}}');
     } else {
