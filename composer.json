@@ -1,8 +1,8 @@
 {
     "name": "setono/deployer-dotenv",
-    "type": "library",
     "description": "Easily update your .env files when deploying",
     "license": "MIT",
+    "type": "library",
     "authors": [
         {
             "name": "Joachim Løvgaard",
@@ -20,14 +20,7 @@
         "phpunit/phpunit": "^9.5",
         "setono/code-quality-pack": "^2.1"
     },
-    "config": {
-        "sort-packages": true
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.1-dev"
-        }
-    },
+    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "Setono\\Deployer\\DotEnv\\": "src/"
@@ -41,7 +34,18 @@
             "Setono\\Deployer\\DotEnv\\": "tests/"
         }
     },
-    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "ergebnis/composer-normalize": true,
+            "dealerdirect/phpcodesniffer-composer-installer": false
+        },
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.1-dev"
+        }
+    },
     "scripts": {
         "analyse": "psalm",
         "check-style": "ecs check",
