@@ -1,13 +1,187 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="4.7.3@38c452ae584467e939d55377aaf83b5a26f19dd1">
-  <file src="src/autoload.php">
-    <UnusedFunctionCall occurrences="1">
-      <code>set_include_path</code>
-    </UnusedFunctionCall>
-  </file>
+<files psalm-version="5.6.0@e784128902dfe01d489c4123d69918a9f3c1eac5">
   <file src="src/recipe/dotenv.php">
-    <PossiblyInvalidMethodCall occurrences="1">
-      <code>has</code>
-    </PossiblyInvalidMethodCall>
+    <UndefinedClass>
+      <code>Deployer</code>
+    </UndefinedClass>
+    <UndefinedFunction>
+      <code>after('deploy:update_code', 'dotenv:prepare')</code>
+    </UndefinedFunction>
+  </file>
+  <file src="src/task/dotenv.php">
+    <MixedArgument>
+      <code>$newValue</code>
+      <code>$output</code>
+      <code>run('cat {{release_path}}/.env.local.php')</code>
+      <code>run('cat {{release_path}}/.env.{{stage}}.local')</code>
+    </MixedArgument>
+    <MixedAssignment>
+      <code>$confirmation</code>
+      <code>$labels</code>
+      <code>$newValue</code>
+      <code>$output</code>
+      <code>$stage</code>
+      <code>$stage</code>
+    </MixedAssignment>
+    <MixedMethodCall>
+      <code>desc</code>
+      <code>desc</code>
+      <code>desc</code>
+      <code>getLabels</code>
+      <code>isInteractive</code>
+    </MixedMethodCall>
+    <PossiblyUndefinedArrayOffset>
+      <code>$val</code>
+    </PossiblyUndefinedArrayOffset>
+    <UndefinedFunction>
+      <code>ask('Input environment variable and value (ENV_VAR=value). Press &lt;return&gt; when you are finished adding', '', array_keys($variables))</code>
+      <code>askConfirmation('Do you want to update ' . (isset($confirmation) ? 'more' : 'any') . ' environment variables?')</code>
+      <code>currentHost()</code>
+      <code>get('stage')</code>
+      <code>has('previous_release')</code>
+      <code>input()</code>
+      <code>invoke('dotenv:generate')</code>
+      <code>output()</code>
+      <code>run($command)</code>
+      <code>run('cat {{release_path}}/.env.local.php')</code>
+      <code>run('cat {{release_path}}/.env.{{stage}}.local')</code>
+      <code>run('cd {{release_path}} &amp;&amp; {{bin/composer}} symfony:dump-env {{stage}}')</code>
+      <code>run('cp {{previous_release}}/.env.{{stage}}.local {{release_path}}')</code>
+      <code>run('echo "APP_ENV={{stage}}" &gt; {{release_path}}/.env.local')</code>
+      <code>run('touch {{release_path}}/.env.{{stage}}.local')</code>
+      <code>set('stage', $stage)</code>
+      <code>task('dotenv:generate', static function (): void {
+    run('cd {{release_path}} &amp;&amp; {{bin/composer}} symfony:dump-env {{stage}}');
+})</code>
+      <code>task('dotenv:prepare', static function (): void {
+    $stage = get('stage');
+
+    // if a stage isn't set, we presume the stage to be prod since you are only deploying to one place
+    if (null === $stage) {
+        $stage = 'prod';
+        $labels = currentHost()-&gt;getLabels();
+        if (null !== $labels &amp;&amp; isset($labels['stage'])) {
+            $stage = $labels['stage'];
+        }
+        set('stage', $stage);
+    }
+
+    // this small trick will make sure the environment (i.e. for the console) is set to the expected environment
+    // when running commands before the generation of the .env.local.php is run
+    if (!test('[ -f {{release_path}}/.env.local ]')) {
+        run('echo "APP_ENV={{stage}}" &gt; {{release_path}}/.env.local');
+    }
+
+    if (has('previous_release') &amp;&amp; test('[ -f {{previous_release}}/.env.{{stage}}.local ]')) {
+        run('cp {{previous_release}}/.env.{{stage}}.local {{release_path}}');
+    } else {
+        run('touch {{release_path}}/.env.{{stage}}.local');
+    }
+})</code>
+      <code>task('dotenv:update', static function (): void {
+    if (!input()-&gt;isInteractive()) {
+        return;
+    }
+
+    $output = output();
+
+    $outputVariablesFunction = static function (OutputInterface $output, array $variables): void {
+        ksort($variables);
+
+        $table = new Table($output);
+        $table-&gt;setRows([
+            ['Variable', 'Value'],
+            new TableSeparator(),
+        ]);
+
+        /**
+         * @var string $key
+         * @var string $val
+         */
+        foreach ($variables as $key =&gt; $val) {
+            $table-&gt;addRow([$key, $val]);
+        }
+
+        $table-&gt;render();
+    };
+
+    $evalEnv = static function (string $envContents): array {
+        /** @var array&lt;string, scalar&gt; $res */
+        $res = eval('?&gt;' . $envContents);
+        Assert::isArray($res);
+        Assert::allScalar($res);
+
+        return $res;
+    };
+
+    /**
+     * We want two arrays to begin with. This allows us to easily compare the two arrays later on
+     * when the $variables may have been changed by the user
+     */
+    $variables = $initialVariables = $evalEnv(run('cat {{release_path}}/.env.local.php'));
+
+    while (true) {
+        $outputVariablesFunction($output, $variables);
+
+        $confirmation = askConfirmation('Do you want to update ' . (isset($confirmation) ? 'more' : 'any') . ' environment variables?');
+        if (false === $confirmation) {
+            break;
+        }
+
+        while (true) {
+            $newValue = ask('Input environment variable and value (ENV_VAR=value). Press &lt;return&gt; when you are finished adding', '', array_keys($variables));
+            if ('' === $newValue) {
+                break;
+            }
+
+            [$key, $val] = explode('=', $newValue, 2);
+
+            // Here we add/overwrite the value from the user
+            $variables[$key] = $val;
+        }
+    }
+
+    /**
+     * Notice that this comparison will return false if the two arrays have different key/value pairs
+     * See https://www.php.net/manual/en/language.operators.array.php
+     */
+    if ($initialVariables != $variables) {
+        /**
+         * This array contains the environment variables already overridden
+         *
+         * @var array&lt;string, string&gt; $overriddenValues
+         */
+        $overriddenValues = (new Dotenv())-&gt;parse(run('cat {{release_path}}/.env.{{stage}}.local'));
+
+        /**
+         * The difference between the $variables array and the $initialVariables array
+         * are the variables that the user has overridden in the dialog above
+         */
+        $newOverriddenValues = array_diff_assoc($variables, $initialVariables);
+
+        /**
+         * Now we merge the new overridden values with the old ones which will
+         * give us the values we need to save to the .env.[stage].local file
+         */
+        $overriddenValues = array_merge($overriddenValues, $newOverriddenValues);
+
+        /**
+         * This will generate a $command variable that will save a multiline text into a file
+         * See https://stackoverflow.com/questions/10969953/how-to-output-a-multiline-string-in-bash
+         */
+        $command = "cat &lt;&lt;EOT &gt; {{release_path}}/.env.{{stage}}.local\n";
+        foreach ($overriddenValues as $key =&gt; $val) {
+            $command .= $key . '=' . $val . "\n";
+        }
+        $command .= 'EOT';
+        run($command);
+
+        // Now we rerun the generation because we changed the environment variables
+        invoke('dotenv:generate');
+    }
+})</code>
+      <code>test('[ -f {{previous_release}}/.env.{{stage}}.local ]')</code>
+      <code>test('[ -f {{release_path}}/.env.local ]')</code>
+    </UndefinedFunction>
   </file>
 </files>
