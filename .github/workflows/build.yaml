@@ -5,8 +5,7 @@ on:
         branches:
             - "master"
     pull_request: ~
-    schedule:
-        -   cron: "5 8 * * 2"
+    workflow_dispatch: ~
 
 env:
     PHP_EXTENSIONS: "mbstring"
