@@ -8,7 +8,7 @@ use function Deployer\after;
 use function Deployer\before;
 use Deployer\Deployer;
 
-require_once 'task/setono_dotenv.php';
+require_once __DIR__ . '/../task/setono_dotenv.php';
 
 after('deploy:update_code', 'dotenv:prepare');
 
