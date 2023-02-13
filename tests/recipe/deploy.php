@@ -19,7 +19,8 @@ set('branch', null);
 
 // Hosts
 localhost()
-    ->set('deploy_path', __DIR__ . '/../../.build/deployer');
+    ->set('deploy_path', __DIR__ . '/../../.build/deployer')
+;
 
 // Tasks
 desc('Deploy your project');

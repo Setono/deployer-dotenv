@@ -16,7 +16,7 @@ $deployer = Deployer::get();
 
 /**
  * The task deploy:cache:clear is defined in Symfony related recipes and both the cache clear
- * and cache warmup tasks sometimes depend on environment variables. Therefore it's a good idea
+ * and cache warmup tasks sometimes depend on environment variables. Therefore, it's a good idea
  * to have environment variables defined before running these tasks.
  */
 if ($deployer->tasks->has('deploy:cache:clear')) {
