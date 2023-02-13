@@ -22,9 +22,6 @@
     },
     "prefer-stable": true,
     "autoload": {
-        "psr-4": {
-            "Setono\\Deployer\\DotEnv\\": "src/"
-        },
         "files": [
             "src/autoload.php"
         ]
