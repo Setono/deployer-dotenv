@@ -6,6 +6,8 @@ namespace Setono\Deployer\DotEnv;
 
 use function Deployer\ask;
 use function Deployer\askConfirmation;
+use function Deployer\currentHost;
+use function Deployer\get;
 use function Deployer\has;
 use function Deployer\input;
 use function Deployer\invoke;
@@ -28,9 +30,16 @@ use Webmozart\Assert\Assert;
  * 2. The deploy:update_code step uses git clone to create the release directory and that command expects an empty dir
  */
 task('dotenv:prepare', static function (): void {
-    if (!has('stage')) {
-        // if a stage isn't set then we presume the stage to be prod since you are only deploying to one place
-        set('stage', 'prod');
+    $stage = get('stage');
+
+    // if a stage isn't set, we presume the stage to be prod since you are only deploying to one place
+    if (null === $stage) {
+        $stage = 'prod';
+        $labels = currentHost()->getLabels();
+        if (null !== $labels && isset($labels['stage'])) {
+            $stage = $labels['stage'];
+        }
+        set('stage', $stage);
     }
 
     // this small trick will make sure the environment (i.e. for the console) is set to the expected environment
