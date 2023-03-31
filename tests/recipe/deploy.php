@@ -11,7 +11,7 @@ use function Deployer\set;
 use function Deployer\task;
 
 require_once 'recipe/common.php';
-require_once 'recipe/dotenv.php';
+require_once 'recipe/setono_dotenv.php';
 
 // configuration
 set('repository', __DIR__ . '/repository');
