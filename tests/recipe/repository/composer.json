@@ -5,5 +5,11 @@
     "require": {
         "symfony/dotenv": "^4.4 || ^5.4",
         "symfony/flex": "^1.9"
+    },
+    "config": {
+        "allow-plugins": {
+            "symfony/flex": true
+        },
+        "sort-packages": true
     }
 }
