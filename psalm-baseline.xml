@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="4.7.3@38c452ae584467e939d55377aaf83b5a26f19dd1">
-  <file src="src/autoload.php">
-    <UnusedFunctionCall occurrences="1">
-      <code>set_include_path</code>
-    </UnusedFunctionCall>
-  </file>
-  <file src="src/recipe/dotenv.php">
-    <PossiblyInvalidMethodCall occurrences="1">
+<files psalm-version="5.9.0@8b9ad1eb9e8b7d3101f949291da2b9f7767cd163">
+  <file src="src/recipe/setono_dotenv.php">
+    <PossiblyInvalidMethodCall>
       <code>has</code>
     </PossiblyInvalidMethodCall>
   </file>

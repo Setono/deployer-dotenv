@@ -39,7 +39,7 @@ In your `deploy.php` file require the recipe:
 
 namespace Deployer;
 
-require_once 'recipe/dotenv.php';
+require_once 'recipe/setono_dotenv.php';
 
 // ...
 ```
