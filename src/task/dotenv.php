@@ -112,6 +112,7 @@ task('dotenv:update', static function (): void {
                 break;
             }
 
+            /** @psalm-suppress PossiblyUndefinedArrayOffset */
             [$key, $val] = explode('=', $newValue, 2);
 
             // Here we add/overwrite the value from the user
