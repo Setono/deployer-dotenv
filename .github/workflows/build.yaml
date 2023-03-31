@@ -26,7 +26,7 @@ jobs:
 
         steps:
             -   name: "Checkout"
-                uses: "actions/checkout@v2"
+                uses: "actions/checkout@v3"
 
             -   name: "Install PHP with extensions"
                 uses: "shivammathur/setup-php@v2"
@@ -39,7 +39,7 @@ jobs:
                 run: "composer validate --strict"
 
             -   name: "Install composer dependencies"
-                uses: "ramsey/composer-install@v1"
+                uses: "ramsey/composer-install@v2"
                 with:
                     dependency-versions: "${{ matrix.dependencies }}"
 
@@ -58,16 +58,18 @@ jobs:
             matrix:
                 php-version:
                     - "7.4"
+                    - "8.0"
+                    - "8.1"
 
                 dependencies:
                     - "highest"
 
         steps:
             -   name: "Checkout"
-                uses: "actions/checkout@v2.3.3"
+                uses: "actions/checkout@v3"
 
             -   name: "Install PHP with extensions"
-                uses: "shivammathur/setup-php@2.7.0"
+                uses: "shivammathur/setup-php@v2"
                 with:
                     coverage: "none"
                     extensions: "${{ env.PHP_EXTENSIONS }}"
@@ -75,7 +77,7 @@ jobs:
                     tools: "composer-require-checker, composer-unused"
 
             -   name: "Install composer dependencies"
-                uses: "ramsey/composer-install@v1"
+                uses: "ramsey/composer-install@v2"
                 with:
                     dependency-versions: "${{ matrix.dependencies }}"
 
@@ -94,37 +96,29 @@ jobs:
             matrix:
                 php-version:
                     - "7.4"
+                    - "8.0"
+                    - "8.1"
 
                 dependencies:
                     - "highest"
 
         steps:
             -   name: "Checkout"
-                uses: "actions/checkout@v2.3.3"
+                uses: "actions/checkout@v3"
 
             -   name: "Install PHP with extensions"
-                uses: "shivammathur/setup-php@2.7.0"
+                uses: "shivammathur/setup-php@v2"
                 with:
                     coverage: "none"
                     extensions: "${{ env.PHP_EXTENSIONS }}"
                     php-version: "${{ matrix.php-version }}"
 
             -   name: "Install composer dependencies"
-                uses: "ramsey/composer-install@v1"
+                uses: "ramsey/composer-install@v2"
                 with:
                     dependency-versions: "${{ matrix.dependencies }}"
 
-            -   name: "Create cache directory for phpstan/phpstan"
-                run: "mkdir -p .build/phpstan"
-
-            -   name: "Cache cache directory for phpstan/phpstan"
-                uses: "actions/cache@v2.1.2"
-                with:
-                    path: ".build/phpstan"
-                    key: "php-${{ matrix.php-version }}-phpstan-${{ github.sha }}"
-                    restore-keys: "php-${{ matrix.php-version }}-phpstan-"
-
-            -   name: "Run phpstan/phpstan"
+            -   name: "Run static analysis"
                 run: "composer analyse"
 
     unit-tests:
@@ -136,6 +130,8 @@ jobs:
             matrix:
                 php-version:
                     - "7.4"
+                    - "8.0"
+                    - "8.1"
 
                 dependencies:
                     - "lowest"
@@ -143,7 +139,7 @@ jobs:
 
         steps:
             -   name: "Checkout"
-                uses: "actions/checkout@v2"
+                uses: "actions/checkout@v3"
 
             -   name: "Setup PHP, with composer and extensions"
                 uses: "shivammathur/setup-php@v2"
@@ -153,7 +149,7 @@ jobs:
                     coverage: "none"
 
             -   name: "Install composer dependencies"
-                uses: "ramsey/composer-install@v1"
+                uses: "ramsey/composer-install@v2"
                 with:
                     dependency-versions: "${{ matrix.dependencies }}"
 
