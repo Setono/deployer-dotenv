@@ -25,7 +25,7 @@ use Webmozart\Assert\Assert;
  *
  * 1. We use the parameter previous_release which is set during the deploy:release step
  *
- * 2. The deploy:update_code step uses git clone to create the release directory and that command expects an empty dir
+ * 2. The deploy:update_code step can use git clone to create the release directory and that command expects an empty dir
  */
 task('dotenv:prepare', static function (): void {
     $stage = getStage();
@@ -34,6 +34,11 @@ task('dotenv:prepare', static function (): void {
     // when running commands before the generation of the .env.local.php is run
     if (!test('[ -f {{release_path}}/.env.local ]')) {
         run(sprintf('echo "APP_ENV=%s" > {{release_path}}/.env.local', $stage));
+    }
+
+    // if the .env.[stage].local file exists, we don't need to do anything
+    if (test(sprintf('[ -f {{release_path}}/.env.%s.local ]', $stage))) {
+        return;
     }
 
     if (has('previous_release') && test(sprintf('[ -f {{previous_release}}/.env.%s.local ]', $stage))) {
@@ -166,7 +171,7 @@ task('dotenv:update', static function (): void {
 function getStage(): string
 {
     $labels = get('labels');
-    if(!is_array($labels)) {
+    if (!is_array($labels)) {
         return 'prod';
     }
 
