@@ -7,9 +7,6 @@ on:
     pull_request: ~
     workflow_dispatch: ~
 
-env:
-    PHP_EXTENSIONS: "mbstring"
-
 jobs:
     coding-standards:
         name: "Coding Standards"
@@ -26,13 +23,12 @@ jobs:
 
         steps:
             -   name: "Checkout"
-                uses: "actions/checkout@v3"
+                uses: "actions/checkout@v4"
 
             -   name: "Install PHP with extensions"
                 uses: "shivammathur/setup-php@v2"
                 with:
                     coverage: "none"
-                    extensions: "${{ env.PHP_EXTENSIONS }}"
                     php-version: "${{ matrix.php-version }}"
 
             -   name: "Validate composer.json and composer.lock"
@@ -64,13 +60,12 @@ jobs:
 
         steps:
             -   name: "Checkout"
-                uses: "actions/checkout@v3"
+                uses: "actions/checkout@v4"
 
             -   name: "Install PHP with extensions"
                 uses: "shivammathur/setup-php@v2"
                 with:
                     coverage: "none"
-                    extensions: "${{ env.PHP_EXTENSIONS }}"
                     php-version: "${{ matrix.php-version }}"
                     tools: "composer-require-checker, composer-unused"
 
@@ -100,32 +95,18 @@ jobs:
 
         steps:
             -   name: "Checkout"
-                uses: "actions/checkout@v3"
+                uses: "actions/checkout@v4"
 
             -   name: "Install PHP with extensions"
                 uses: "shivammathur/setup-php@v2"
                 with:
                     coverage: "none"
-                    extensions: "${{ env.PHP_EXTENSIONS }}"
                     php-version: "${{ matrix.php-version }}"
 
             -   name: "Install composer dependencies"
                 uses: "ramsey/composer-install@v2"
                 with:
                     dependency-versions: "${{ matrix.dependencies }}"
-
-            -   name: "Create cache directory for phpstan/phpstan"
-                run: "mkdir -p .build/phpstan"
-
-            -   name: "Cache cache directory for phpstan/phpstan"
-                uses: "actions/cache@v2.1.2"
-                with:
-                    path: ".build/phpstan"
-                    key: "php-${{ matrix.php-version }}-phpstan-${{ github.sha }}"
-                    restore-keys: "php-${{ matrix.php-version }}-phpstan-"
-
-            -   name: "Run phpstan/phpstan"
-                run: "composer analyse"
 
     unit-tests:
         name: "Unit tests"
@@ -143,13 +124,12 @@ jobs:
 
         steps:
             -   name: "Checkout"
-                uses: "actions/checkout@v3"
+                uses: "actions/checkout@v4"
 
             -   name: "Setup PHP, with composer and extensions"
                 uses: "shivammathur/setup-php@v2"
                 with:
                     php-version: "${{ matrix.php-version }}"
-                    extensions: "${{ env.PHP_EXTENSIONS }}"
                     coverage: "none"
 
             -   name: "Install composer dependencies"

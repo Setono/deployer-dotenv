@@ -1,7 +1,6 @@
 # DotEnv handling with Deployer
 
 [![Latest Version][ico-version]][link-packagist]
-[![Latest Unstable Version][ico-unstable-version]][link-packagist]
 [![Software License][ico-license]](LICENSE)
 [![Build Status][ico-github-actions]][link-github-actions]
 
@@ -22,7 +21,7 @@ Instead, we have a `.env.[stage].local` and `.env.local.php` in each release fol
 * If you are deploying interactively (i.e. manually) you are presented with a dialog asking if you want to update any
 environment variables.
 
-* Finally we run `composer symfony:dump-env [stage]` to generate the `.env.local.php` file for the current release.
+* Finally, we run `composer symfony:dump-env [stage]` to generate the `.env.local.php` file for the current release.
 
 ## Installation
 
@@ -47,7 +46,6 @@ require_once 'recipe/setono_dotenv.php';
 This will automatically hook into the default flow of Deployer.
 
 [ico-version]: https://poser.pugx.org/setono/deployer-dotenv/v/stable
-[ico-unstable-version]: https://poser.pugx.org/setono/deployer-dotenv/v/unstable
 [ico-license]: https://poser.pugx.org/setono/deployer-dotenv/license
 [ico-github-actions]: https://github.com/Setono/deployer-dotenv/workflows/build/badge.svg
 

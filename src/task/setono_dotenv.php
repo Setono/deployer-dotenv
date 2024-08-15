@@ -4,16 +4,9 @@ declare(strict_types=1);
 
 namespace Setono\Deployer\DotEnv;
 
-use function Deployer\ask;
-use function Deployer\askConfirmation;
 use function Deployer\currentHost;
-use function Deployer\get;
-use function Deployer\has;
-use function Deployer\input;
 use function Deployer\invoke;
-use function Deployer\output;
 use function Deployer\run;
-use function Deployer\set;
 use function Deployer\task;
 use function Deployer\test;
 use Symfony\Component\Console\Helper\Table;
