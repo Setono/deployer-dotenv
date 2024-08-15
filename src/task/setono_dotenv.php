@@ -161,11 +161,11 @@ task('dotenv:update', static function (): void {
  */
 function getStage(): string
 {
-    /** @var mixed|array $labels */
     $labels = get('labels');
-    Assert::isArray($labels);
+    if(!is_array($labels)) {
+        return 'prod';
+    }
 
-    // We presume that the stage is prod if it isn't set
     if (!isset($labels['stage'])) {
         return 'prod';
     }
