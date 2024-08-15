@@ -36,10 +36,10 @@ task('dotenv:prepare', static function (): void {
         run(sprintf('echo "APP_ENV=%s" > {{release_path}}/.env.local', $stage));
     }
 
-    if (has('previous_release') && test('[ -f {{previous_release}}/.env.{{stage}}.local ]')) {
-        run('cp {{previous_release}}/.env.{{stage}}.local {{release_path}}');
+    if (has('previous_release') && test(sprintf('[ -f {{previous_release}}/.env.%s.local ]', $stage))) {
+        run(sprintf('cp {{previous_release}}/.env.%s.local {{release_path}}', $stage));
     } else {
-        run('touch {{release_path}}/.env.{{stage}}.local');
+        run(sprintf('touch {{release_path}}/.env.%s.local', $stage));
     }
 })->desc('Copies .env.[stage].local from previous release folder or creates a new one');
 
@@ -47,7 +47,9 @@ task('dotenv:prepare', static function (): void {
  * This task should be called BEFORE dotenv:update because that task needs the .env.local.php file
  */
 task('dotenv:generate', static function (): void {
-    run('cd {{release_path}} && {{bin/composer}} symfony:dump-env {{stage}}');
+    $stage = getStage();
+
+    run(sprintf('cd {{release_path}} && {{bin/composer}} symfony:dump-env %s', $stage));
 })->desc('Generates the .env.local.php file');
 
 /**
@@ -116,6 +118,8 @@ task('dotenv:update', static function (): void {
         }
     }
 
+    $stage = getStage();
+
     /**
      * Notice that this comparison will return false if the two arrays have different key/value pairs
      * See https://www.php.net/manual/en/language.operators.array.php
@@ -126,7 +130,7 @@ task('dotenv:update', static function (): void {
          *
          * @var array<string, string> $overriddenValues
          */
-        $overriddenValues = (new Dotenv())->parse(run('cat {{release_path}}/.env.{{stage}}.local'));
+        $overriddenValues = (new Dotenv())->parse(run(sprintf('cat {{release_path}}/.env.%s.local', $stage)));
 
         /**
          * The difference between the $variables array and the $initialVariables array
@@ -144,7 +148,7 @@ task('dotenv:update', static function (): void {
          * This will generate a $command variable that will save a multiline text into a file
          * See https://stackoverflow.com/questions/10969953/how-to-output-a-multiline-string-in-bash
          */
-        $command = "cat <<EOT > {{release_path}}/.env.{{stage}}.local\n";
+        $command = sprintf("cat <<EOT > {{release_path}}/.env.%s.local\n", $stage);
         foreach ($overriddenValues as $key => $val) {
             $command .= $key . '=' . $val . "\n";
         }
