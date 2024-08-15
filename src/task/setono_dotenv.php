@@ -19,6 +19,7 @@ use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Dotenv\Dotenv;
 use Webmozart\Assert\Assert;
+use function Deployer\upload;
 
 /**
  * This step has to come AFTER the deploy:update_code step because
@@ -149,16 +150,18 @@ task('dotenv:update', static function (): void {
          */
         $overriddenValues = array_merge($overriddenValues, $newOverriddenValues);
 
-        /**
-         * This will generate a $command variable that will save a multiline text into a file
-         * See https://stackoverflow.com/questions/10969953/how-to-output-a-multiline-string-in-bash
-         */
-        $command = sprintf("cat <<EOT > {{release_path}}/.env.%s.local\n", $stage);
+        $filename = sprintf(__DIR__ . '/.env.%s.local', $stage);
+
+        $data = '';
         foreach ($overriddenValues as $key => $val) {
-            $command .= $key . '=' . $val . "\n";
+            $data .= $key . '=' . $val . "\n";
         }
-        $command .= 'EOT';
-        run($command);
+
+        file_put_contents($filename, $data);
+
+        upload($filename, '{{release_path}}');
+
+        unlink($filename);
 
         // Now we rerun the generation because we changed the environment variables
         invoke('dotenv:generate');
