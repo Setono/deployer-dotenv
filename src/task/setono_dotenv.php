@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace Setono\Deployer\DotEnv;
 
-use function Deployer\currentHost;
+use function Deployer\ask;
+use function Deployer\askConfirmation;
+use function Deployer\get;
+use function Deployer\has;
+use function Deployer\input;
 use function Deployer\invoke;
+use function Deployer\output;
 use function Deployer\run;
 use function Deployer\task;
 use function Deployer\test;
@@ -23,22 +28,12 @@ use Webmozart\Assert\Assert;
  * 2. The deploy:update_code step uses git clone to create the release directory and that command expects an empty dir
  */
 task('dotenv:prepare', static function (): void {
-    $stage = get('stage');
-
-    // if a stage isn't set, we presume the stage to be prod since you are only deploying to one place
-    if (null === $stage) {
-        $stage = 'prod';
-        $labels = currentHost()->getLabels();
-        if (null !== $labels && isset($labels['stage'])) {
-            $stage = $labels['stage'];
-        }
-        set('stage', $stage);
-    }
+    $stage = getStage();
 
     // this small trick will make sure the environment (i.e. for the console) is set to the expected environment
     // when running commands before the generation of the .env.local.php is run
     if (!test('[ -f {{release_path}}/.env.local ]')) {
-        run('echo "APP_ENV={{stage}}" > {{release_path}}/.env.local');
+        run(sprintf('echo "APP_ENV=%s" > {{release_path}}/.env.local', $stage));
     }
 
     if (has('previous_release') && test('[ -f {{previous_release}}/.env.{{stage}}.local ]')) {
@@ -160,3 +155,23 @@ task('dotenv:update', static function (): void {
         invoke('dotenv:generate');
     }
 })->desc('Allows the user to update environment variables');
+
+/**
+ * Returns the current stage or 'prod' if no stage is set
+ */
+function getStage(): string
+{
+    /** @var mixed|array $labels */
+    $labels = get('labels');
+    Assert::isArray($labels);
+
+    // We presume that the stage is prod if it isn't set
+    if (!isset($labels['stage'])) {
+        return 'prod';
+    }
+
+    $state = $labels['stage'];
+    Assert::stringNotEmpty($state);
+
+    return $state;
+}
