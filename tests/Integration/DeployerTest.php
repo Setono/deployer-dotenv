@@ -46,6 +46,6 @@ return array (
   'MAILER_DSN' => 'smtp://localhost',
 );
 CONTENT
-, $ssh->exec(sprintf('cat %s/.env.local.php', $releasePath)));
+            , trim($ssh->exec(sprintf('cat %s/.env.local.php', $releasePath))));
     }
 }
