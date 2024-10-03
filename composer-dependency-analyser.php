@@ -5,5 +5,6 @@ use ShipMonk\ComposerDependencyAnalyser\Config\ErrorType;
 
 return (new Configuration())
     ->addPathToExclude(__DIR__ . '/tests')
+    ->addPathToScan(__DIR__ . '/src', false)
     ->ignoreErrorsOnPackage('deployer/deployer', [ErrorType::UNUSED_DEPENDENCY])
 ;
