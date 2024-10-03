@@ -6,11 +6,13 @@ namespace Deployer;
 
 require_once '../../vendor/autoload.php';
 
-require_once 'recipe/common.php';
+require_once 'recipe/composer.php';
 require_once 'recipe/setono_dotenv.php';
 
 // Config
 set('repository', 'https://github.com/Setono/deployer-dotenv.git');
+set('target', '2.x');
+set('composer_options', '--verbose --prefer-dist --no-progress --no-interaction --optimize-autoloader'); // Removed the --no-dev option
 
 // Hosts
 host('127.0.0.1')
