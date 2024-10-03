@@ -47,7 +47,5 @@ return array (
 );
 CONTENT
 , $ssh->exec(sprintf('cat %s/.env.local.php', $releasePath)));
-
-        // todo add assertions
     }
 }
