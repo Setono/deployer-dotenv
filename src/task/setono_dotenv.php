@@ -14,12 +14,11 @@ use function Deployer\output;
 use function Deployer\run;
 use function Deployer\task;
 use function Deployer\test;
+use function Deployer\upload;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Dotenv\Dotenv;
 use Webmozart\Assert\Assert;
-use function Deployer\upload;
 
 /**
  * This step has to come AFTER the deploy:update_code step because
@@ -66,45 +65,14 @@ task('dotenv:update', static function (): void {
         return;
     }
 
-    $output = output();
-
-    $outputVariablesFunction = static function (OutputInterface $output, array $variables): void {
-        ksort($variables);
-
-        $table = new Table($output);
-        $table->setRows([
-            ['Variable', 'Value'],
-            new TableSeparator(),
-        ]);
-
-        /**
-         * @var string $key
-         * @var string $val
-         */
-        foreach ($variables as $key => $val) {
-            $table->addRow([$key, $val]);
-        }
-
-        $table->render();
-    };
-
-    $evalEnv = static function (string $envContents): array {
-        /** @var array<string, scalar> $res */
-        $res = eval('?>' . $envContents);
-        Assert::isArray($res);
-        Assert::allScalar($res);
-
-        return $res;
-    };
-
     /**
      * We want two arrays to begin with. This allows us to easily compare the two arrays later on
      * when the $variables may have been changed by the user
      */
-    $variables = $initialVariables = $evalEnv(run('cat {{release_path}}/.env.local.php'));
+    $variables = $initialVariables = evaluatePhpEnvFile('{{release_path}}/.env.local.php');
 
     while (true) {
-        $outputVariablesFunction($output, $variables);
+        outputEnvironmentVariables($variables);
 
         $confirmation = askConfirmation('Do you want to update ' . (isset($confirmation) ? 'more' : 'any') . ' environment variables?');
         if (false === $confirmation) {
@@ -121,6 +89,24 @@ task('dotenv:update', static function (): void {
 
             // Here we add/overwrite the value from the user
             $variables[$key] = $val;
+        }
+    }
+
+    while (true) {
+        outputEnvironmentVariables($variables);
+
+        $confirmation = askConfirmation('Do you want to remove ' . (isset($confirmation) ? 'more' : 'any') . ' environment variables?');
+        if (false === $confirmation) {
+            break;
+        }
+
+        while (true) {
+            $variable = ask('Input environment variable. Press <return> when you are finished removing', '', array_keys($variables));
+            if ('' === $variable) {
+                break;
+            }
+
+            unset($variables[$variable]);
         }
     }
 
@@ -186,4 +172,41 @@ function getStage(): string
     Assert::stringNotEmpty($stage);
 
     return $stage;
+}
+
+function outputEnvironmentVariables(array $variables): void
+{
+    ksort($variables);
+
+    $table = new Table(output());
+    $table->setRows([
+        ['Variable', 'Value'],
+        new TableSeparator(),
+    ]);
+
+    /**
+     * @var string $key
+     * @var string $val
+     */
+    foreach ($variables as $key => $val) {
+        $table->addRow([$key, $val]);
+    }
+
+    $table->render();
+}
+
+/**
+ * @return array<string, scalar>
+ */
+function evaluatePhpEnvFile(string $path): array
+{
+    $data = run(sprintf('cat %s', $path));
+    Assert::stringNotEmpty($data);
+
+    /** @var array<string, scalar> $res */
+    $res = eval('?>' . $data);
+    Assert::isArray($res);
+    Assert::allScalar($res);
+
+    return $res;
 }

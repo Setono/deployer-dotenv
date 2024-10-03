@@ -1,11 +1,17 @@
 name: "build"
-
 on:
     push:
         branches:
             - "*.x"
-    pull_request: ~
+        paths-ignore:
+            - "*.md"
+    pull_request:
+        paths-ignore:
+            - "*.md"
     workflow_dispatch: ~
+
+env:
+    PHP_EXTENSIONS: "mbstring"
 
 jobs:
     coding-standards:
@@ -25,24 +31,25 @@ jobs:
             -   name: "Checkout"
                 uses: "actions/checkout@v4"
 
-            -   name: "Install PHP with extensions"
+            -   name: "Setup PHP, with composer and extensions"
                 uses: "shivammathur/setup-php@v2"
                 with:
-                    coverage: "none"
                     php-version: "${{ matrix.php-version }}"
-
-            -   name: "Validate composer.json and composer.lock"
-                run: "composer validate --strict"
+                    extensions: "${{ env.PHP_EXTENSIONS }}"
+                    coverage: "none"
 
             -   name: "Install composer dependencies"
-                uses: "ramsey/composer-install@v2"
+                uses: "ramsey/composer-install@v3"
                 with:
                     dependency-versions: "${{ matrix.dependencies }}"
 
-            -   name: "Run ergebnis/composer-normalize"
+            -   name: "Validate composer"
+                run: "composer validate --strict"
+
+            -   name: "Check composer normalized"
                 run: "composer normalize --dry-run"
 
-            -   name: "Run symplify/easy-coding-standard"
+            -   name: "Check style"
                 run: "composer check-style"
 
     dependency-analysis:
@@ -54,31 +61,40 @@ jobs:
             matrix:
                 php-version:
                     - "8.1"
+                    - "8.2"
+                    - "8.3"
 
                 dependencies:
+                    - "lowest"
                     - "highest"
 
         steps:
             -   name: "Checkout"
                 uses: "actions/checkout@v4"
 
-            -   name: "Install PHP with extensions"
+            -   name: "Setup PHP, with composer and extensions"
                 uses: "shivammathur/setup-php@v2"
                 with:
                     coverage: "none"
+                    extensions: "${{ env.PHP_EXTENSIONS }}"
                     php-version: "${{ matrix.php-version }}"
-                    tools: "composer-require-checker, composer-unused"
+
+            -   name: "Remove require-dev section in composer.json"
+                run: "composer config --unset require-dev"
+
+            -   name: "Remove autoload-dev section in composer.json"
+                run: "composer config --unset autoload-dev"
+
+            -   name: "Add shipmonk/composer-dependency-analyser to composer.json"
+                run: "composer require --dev --no-install --no-update --no-plugins --no-scripts shipmonk/composer-dependency-analyser"
 
             -   name: "Install composer dependencies"
-                uses: "ramsey/composer-install@v2"
+                uses: "ramsey/composer-install@v3"
                 with:
                     dependency-versions: "${{ matrix.dependencies }}"
 
-            -   name: "Run maglnet/composer-require-checker"
-                run: "composer-require-checker check"
-
-            -   name: "Run icanhazstring/composer-unused"
-                run: "composer-unused"
+            -   name: "Run dependency analysis"
+                run: "vendor/bin/composer-dependency-analyser"
 
     static-code-analysis:
         name: "Static Code Analysis"
@@ -89,34 +105,8 @@ jobs:
             matrix:
                 php-version:
                     - "8.1"
-
-                dependencies:
-                    - "highest"
-
-        steps:
-            -   name: "Checkout"
-                uses: "actions/checkout@v4"
-
-            -   name: "Install PHP with extensions"
-                uses: "shivammathur/setup-php@v2"
-                with:
-                    coverage: "none"
-                    php-version: "${{ matrix.php-version }}"
-
-            -   name: "Install composer dependencies"
-                uses: "ramsey/composer-install@v2"
-                with:
-                    dependency-versions: "${{ matrix.dependencies }}"
-
-    unit-tests:
-        name: "Unit tests"
-
-        runs-on: "ubuntu-latest"
-
-        strategy:
-            matrix:
-                php-version:
-                    - "8.1"
+                    - "8.2"
+                    - "8.3"
 
                 dependencies:
                     - "lowest"
@@ -130,12 +120,56 @@ jobs:
                 uses: "shivammathur/setup-php@v2"
                 with:
                     php-version: "${{ matrix.php-version }}"
+                    extensions: "${{ env.PHP_EXTENSIONS }}"
                     coverage: "none"
 
             -   name: "Install composer dependencies"
-                uses: "ramsey/composer-install@v2"
+                uses: "ramsey/composer-install@v3"
+                with:
+                    dependency-versions: "${{ matrix.dependencies }}"
+
+            -   name: "Static analysis"
+                run: "composer analyse"
+    unit-tests:
+        name: "Unit tests"
+
+        runs-on: "ubuntu-latest"
+
+        strategy:
+            matrix:
+                php-version:
+                    - "8.1"
+                    - "8.2"
+                    - "8.3"
+
+                dependencies:
+                    - "lowest"
+                    - "highest"
+
+        steps:
+            -   name: "Checkout"
+                uses: "actions/checkout@v4"
+
+            -   name: "Build Docker image"
+                run: "docker build -t setono/deployer-cron --no-cache ./tests/docker"
+
+            -   name: "Run Docker container"
+                run: "docker run -d -p 2222:22 setono/deployer-cron"
+
+            -   name: "Change permissions"
+                run: "chmod 600 ./tests/docker/ssh/id_rsa && chmod 644 ./tests/docker/ssh/id_rsa.pub"
+
+            -   name: "Setup PHP, with composer and extensions"
+                uses: "shivammathur/setup-php@v2"
+                with:
+                    coverage: "none"
+                    extensions: "${{ env.PHP_EXTENSIONS }}"
+                    php-version: "${{ matrix.php-version }}"
+
+            -   name: "Install composer dependencies"
+                uses: "ramsey/composer-install@v3"
                 with:
                     dependency-versions: "${{ matrix.dependencies }}"
 
             -   name: "Run phpunit"
-                run: "composer phpunit"
+                run: "vendor/bin/phpunit"

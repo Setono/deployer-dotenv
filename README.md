@@ -45,6 +45,32 @@ require_once 'recipe/setono_dotenv.php';
 
 This will automatically hook into the default flow of Deployer.
 
+## Testing
+
+1. Set correct permissions on the SSH keys:
+    
+   ```shell
+   chmod 600 tests/docker/ssh/id_rsa && chmod 644 tests/docker/ssh/id_rsa.pub
+   ```
+
+2. Build the Docker image:
+
+   ```shell
+   docker build -t setono/deployer-dotenv --no-cache ./tests/docker
+   ```
+
+3. Run the Docker container:
+
+   ```shell
+   docker run -d -p 2222:22 setono/deployer-dotenv
+   ```
+
+4. Run the tests:
+
+   ```shell
+   vendor/bin/phpunit
+   ```
+
 [ico-version]: https://poser.pugx.org/setono/deployer-dotenv/v/stable
 [ico-license]: https://poser.pugx.org/setono/deployer-dotenv/license
 [ico-github-actions]: https://github.com/Setono/deployer-dotenv/workflows/build/badge.svg
