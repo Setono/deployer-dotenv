@@ -91,6 +91,7 @@ task('dotenv:update', static function (): void {
             $variables[$key] = $val;
         }
     }
+    unset($confirmation);
 
     while (true) {
         outputEnvironmentVariables($variables);
