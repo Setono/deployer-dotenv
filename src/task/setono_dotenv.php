@@ -182,8 +182,8 @@ function getStage(): string
         return 'prod';
     }
 
-    $state = $labels['stage'];
-    Assert::stringNotEmpty($state);
+    $stage = $labels['stage'];
+    Assert::stringNotEmpty($stage);
 
-    return $state;
+    return $stage;
 }
