@@ -85,6 +85,13 @@ task('dotenv:update', static function (): void {
                 break;
             }
 
+            if (!preg_match('/^[a-zA-Z_]\w*=.+$/', $newValue)) {
+                output()->writeln('<error>Invalid input. Please provide a valid environment variable and value (ENV_VAR=value)</error>');
+
+                continue;
+            }
+
+            /** @psalm-suppress PossiblyUndefinedArrayOffset */
             [$key, $val] = explode('=', $newValue, 2);
 
             // Here we add/overwrite the value from the user
@@ -206,8 +213,6 @@ function evaluatePhpEnvFile(string $path): array
 
     /** @var array<string, scalar> $res */
     $res = eval('?>' . $data);
-    Assert::isArray($res);
-    Assert::allScalar($res);
 
     return $res;
 }
