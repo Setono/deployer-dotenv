@@ -25,12 +25,12 @@ use Webmozart\Assert\Assert;
  *
  * 1. We use the parameter previous_release which is set during the deploy:release step
  *
- * 2. The deploy:update_code step can use git clone to create the release directory and that command expects an empty dir
+ * 2. The deploy:update_code step can use git clone to create the release directory, and that command expects an empty dir
  */
 task('dotenv:prepare', static function (): void {
     $stage = getStage();
 
-    // this small trick will make sure the environment (i.e. for the console) is set to the expected environment
+    // this small trick will make sure the environment (i.e., for the console) is set to the expected environment
     // when running commands before the generation of the .env.local.php is run
     if (!test('[ -f {{release_path}}/.env.local ]')) {
         run(sprintf('echo "APP_ENV=%s" > {{release_path}}/.env.local', $stage));
@@ -69,7 +69,7 @@ task('dotenv:update', static function (): void {
      * We want two arrays to begin with. This allows us to easily compare the two arrays later on
      * when the $variables may have been changed by the user
      */
-    $variables = $initialVariables = evaluatePhpEnvFile('{{release_path}}/.env.local.php');
+    $variables = $initialVariables = evaluatePhpEnv(run('cat {{release_path}}/.env.local.php'));
 
     while (true) {
         outputEnvironmentVariables($variables);
@@ -165,9 +165,10 @@ task('dotenv:update', static function (): void {
 /**
  * Returns the current stage or 'prod' if no stage is set
  */
-function getStage(): string
+function getStage(mixed $labels = null): string
 {
-    $labels = get('labels');
+    /** @var mixed $labels */
+    $labels = $labels ?? get('labels');
     if (!is_array($labels)) {
         return 'prod';
     }
@@ -206,9 +207,8 @@ function outputEnvironmentVariables(array $variables): void
 /**
  * @return array<string, string>
  */
-function evaluatePhpEnvFile(string $path): array
+function evaluatePhpEnv(string $data): array
 {
-    $data = run(sprintf('cat %s', $path));
     Assert::stringNotEmpty($data);
 
     /** @var array<string, string> $res */
