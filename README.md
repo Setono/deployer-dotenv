@@ -15,10 +15,10 @@ Now we have a very specific, but simple, strategy for updating the `.env` files 
 * We do **not** share the `.env.local.php`, `.env.local` files as is the default by Deployer.
 Instead, we have a `.env.[stage].local` and `.env.local.php` in each release folder.
 
-* When deploying we copy the `.env.[stage].local` file from the previous release
+* When deploying, we copy the `.env.[stage].local` file from the previous release
 (if there was a previous release, else we create it).
 
-* If you are deploying interactively (i.e. manually) you are presented with a dialog asking if you want to update any
+* If you are deploying interactively (i.e., manually), you are presented with a dialog asking if you want to update any
 environment variables.
 
 * Finally, we run `composer symfony:dump-env [stage]` to generate the `.env.local.php` file for the current release.
@@ -44,32 +44,6 @@ require_once 'recipe/setono_dotenv.php';
 ```
 
 This will automatically hook into the default flow of Deployer.
-
-## Testing
-
-1. Set correct permissions on the SSH keys:
-    
-   ```shell
-   chmod 600 tests/docker/ssh/id_rsa && chmod 644 tests/docker/ssh/id_rsa.pub
-   ```
-
-2. Build the Docker image:
-
-   ```shell
-   docker build -t setono/deployer-dotenv --no-cache ./tests/docker
-   ```
-
-3. Run the Docker container:
-
-   ```shell
-   docker run -d -p 2222:22 setono/deployer-dotenv
-   ```
-
-4. Run the tests:
-
-   ```shell
-   vendor/bin/phpunit
-   ```
 
 [ico-version]: https://poser.pugx.org/setono/deployer-dotenv/v/stable
 [ico-license]: https://poser.pugx.org/setono/deployer-dotenv/license
