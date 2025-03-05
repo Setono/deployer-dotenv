@@ -80,8 +80,8 @@ task('dotenv:update', static function (): void {
         }
 
         while (true) {
-            $newValue = ask('Input environment variable and value (ENV_VAR=value). Press <return> when you are finished adding', '', array_keys($variables));
-            if ('' === $newValue) {
+            $newValue = ask('Input environment variable and value (ENV_VAR=value). Press <return> when you are finished adding', null, array_keys($variables));
+            if (null === $newValue || '' === $newValue) {
                 break;
             }
 
@@ -109,8 +109,8 @@ task('dotenv:update', static function (): void {
         }
 
         while (true) {
-            $variable = ask('Input environment variable. Press <return> when you are finished removing', '', array_keys($variables));
-            if ('' === $variable) {
+            $variable = ask('Input environment variable. Press <return> when you are finished removing', null, array_keys($variables));
+            if (null === $variable || '' === $variable) {
                 break;
             }
 
@@ -139,7 +139,7 @@ task('dotenv:update', static function (): void {
         $newOverriddenValues = array_diff_assoc($variables, $initialVariables);
 
         /**
-         * Now we merge the new overridden values with the old ones which will
+         * Now we merge the new overridden values with the old ones, which will
          * give us the values we need to save to the .env.[stage].local file
          */
         $overriddenValues = array_merge($overriddenValues, $newOverriddenValues);
@@ -204,14 +204,14 @@ function outputEnvironmentVariables(array $variables): void
 }
 
 /**
- * @return array<string, scalar>
+ * @return array<string, string>
  */
 function evaluatePhpEnvFile(string $path): array
 {
     $data = run(sprintf('cat %s', $path));
     Assert::stringNotEmpty($data);
 
-    /** @var array<string, scalar> $res */
+    /** @var array<string, string> $res */
     $res = eval('?>' . $data);
 
     return $res;
